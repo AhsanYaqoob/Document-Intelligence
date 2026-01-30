@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  agent-api:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      # This saves your work! Uploads and DB will persist on your PC.
+      - ./data/uploads:/app/data/uploads
+      - ./data/vector_db:/app/data/vector_db
+    restart: always
