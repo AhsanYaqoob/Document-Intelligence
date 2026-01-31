@@ -29,17 +29,24 @@ class QAAgent:
         # 4. Format context from retrieved documents
         context = "\n\n".join([doc.page_content for doc in docs])
         
-        # 5. Create prompt template
-        prompt = ChatPromptTemplate.from_template(
-            """Answer the question based only on the following context:
+        # 5. Create prompt template with system instructions
+        prompt = ChatPromptTemplate.from_messages([
+            ("system", """You are an intelligent document analysis assistant. Your role is to provide accurate, concise, and helpful answers based solely on the provided context.
 
-Context:
+Guidelines:
+- Answer questions using ONLY the information from the provided context
+- If the context doesn't contain enough information to answer the question, clearly state that
+- Be precise and cite specific details from the context when relevant
+- If asked about something not in the context, say "I don't have that information in the provided document"
+- Maintain a professional and helpful tone
+- Structure your answers clearly with bullet points or paragraphs as appropriate"""),
+            ("user", """Context from the document:
 {context}
 
 Question: {question}
 
-Answer:"""
-        )
+Answer:""")
+        ])
         
         # 6. Create chain and invoke
         chain = prompt | self.llm | StrOutputParser()
