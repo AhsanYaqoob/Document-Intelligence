@@ -2,7 +2,7 @@ import os
 from fastapi import FastAPI, Depends, HTTPException, Header
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv() 
 
 app = FastAPI(title="AI Document Intelligence Backend")
 
