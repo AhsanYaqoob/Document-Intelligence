@@ -1,6 +1,7 @@
 # Core Framework
 fastapi
 uvicorn
+aiofiles
 python-multipart
 python-dotenv
 

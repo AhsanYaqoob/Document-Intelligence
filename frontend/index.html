@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Document Intelligence</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Confirm Modal -->
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal">
+      <div class="modal-icon">🗑️</div>
+      <h3 class="modal-title" id="modalTitle">Remove Document?</h3>
+      <p class="modal-msg" id="modalMsg">This will remove the document from the list.</p>
+      <div class="modal-actions">
+        <button class="btn-modal-cancel" id="modalCancel">Cancel</button>
+        <button class="btn-modal-confirm" id="modalConfirm">Remove</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">🧠</span>
+        <span class="logo-text">AI Document Intelligence</span>
+      </div>
+      <div class="header-right">
+        <div class="header-stat" id="headerStat" style="display:none;">
+          <span id="headerDocCount">0</span> doc<span id="headerDocPlural">s</span>
+        </div>
+        <div class="header-badge">Powered by Groq AI</div>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-layout">
+    <!-- LEFT PANEL: Upload -->
+    <aside class="sidebar">
+      <section class="card upload-section">
+        <h2 class="section-title">📄 Upload Document</h2>
+
+        <div class="drop-zone" id="dropZone">
+          <div class="drop-icon">📁</div>
+          <p class="drop-label">Drag & drop a PDF here</p>
+          <p class="drop-sub">or click to browse</p>
+          <input type="file" id="fileInput" accept=".pdf" hidden />
+        </div>
+
+        <div class="selected-file" id="selectedFile" style="display:none;">
+          <span class="file-icon">📎</span>
+          <div class="file-info">
+            <span class="file-name" id="fileName"></span>
+            <span class="file-size" id="fileSize"></span>
+          </div>
+          <button class="btn-clear" id="clearFile" title="Remove">✕</button>
+        </div>
+
+        <!-- Upload progress bar -->
+        <div class="progress-bar-wrap" id="progressWrap" style="display:none;">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <button class="btn-primary" id="uploadBtn" disabled>
+          <span id="uploadBtnText">Upload & Analyze</span>
+          <span id="uploadSpinner" class="spinner" style="display:none;"></span>
+        </button>
+
+        <div class="upload-status" id="uploadStatus"></div>
+      </section>
+
+      <!-- Uploaded Documents List -->
+      <section class="card docs-section">
+        <div class="docs-header">
+          <h2 class="section-title" style="margin-bottom:0;">📚 Documents</h2>
+          <button class="btn-icon-ghost" id="clearAllDocsBtn" title="Remove all documents" style="display:none;">
+            Clear all
+          </button>
+        </div>
+        <div class="docs-list" id="docsList">
+          <p class="empty-msg">No documents uploaded yet.</p>
+        </div>
+      </section>
+    </aside>
+
+    <!-- RIGHT PANEL: Q&A -->
+    <section class="qa-panel card">
+      <div class="qa-header">
+        <div class="qa-header-left">
+          <h2 class="section-title" style="margin-bottom:0;">💬 Ask a Question</h2>
+          <div class="active-doc-badge" id="activeDocBadge" style="display:none;">
+            <span class="dot"></span>
+            <span id="activeDocName">No document selected</span>
+          </div>
+        </div>
+        <div class="qa-header-actions">
+          <span class="msg-counter" id="msgCounter" style="display:none;"></span>
+          <button class="btn-ghost" id="clearChatBtn" title="Clear conversation" style="display:none;">
+            🗑 Clear Chat
+          </button>
+        </div>
+      </div>
+
+      <div class="chat-window" id="chatWindow">
+        <div class="chat-placeholder" id="chatPlaceholder">
+          <div class="placeholder-icon">🤖</div>
+          <p>Upload a document and select it,<br>then ask anything about it.</p>
+          <div class="shortcut-hints">
+            <span class="hint-chip">Enter ↵ to send</span>
+            <span class="hint-chip">Click doc to switch</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-input-area">
+        <div class="input-wrapper">
+          <input
+            type="text"
+            id="questionInput"
+            class="chat-input"
+            placeholder="Type your question and press Enter…"
+            disabled
+            maxlength="500"
+          />
+          <span class="char-counter" id="charCounter"></span>
+        </div>
+        <button class="btn-send" id="sendBtn" disabled>
+          <span id="sendBtnText">Send</span>
+          <span id="sendSpinner" class="spinner" style="display:none;"></span>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

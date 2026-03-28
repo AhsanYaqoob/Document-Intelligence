@@ -2,7 +2,6 @@ import os
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.runnables import RunnablePassthrough
 from app.services.vector_store import VectorStoreService
 
 class QAAgent:
@@ -10,7 +9,9 @@ class QAAgent:
         self.name = "QAAgent"
         self.llm = ChatGroq(
             api_key=os.getenv("GROQ_API_KEY"),
-            model_name=os.getenv("GROQ_MODEL_NAME")
+            model_name=os.getenv("GROQ_MODEL_NAME"),
+            temperature=0.3,
+            max_tokens=1024,
         )
         self.vector_service = VectorStoreService()
 
@@ -20,40 +21,48 @@ class QAAgent:
         if not vector_db:
             return "Knowledge base not found. Please upload the document first."
 
-        # 2. Create retriever
-        retriever = vector_db.as_retriever(search_kwargs={"k": 3})
-        
-        # 3. Retrieve relevant documents
-        docs = retriever.invoke(question)
-        
-        # 4. Format context from retrieved documents
-        context = "\n\n".join([doc.page_content for doc in docs])
-        
-        # 5. Create prompt template with system instructions
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", """You are an intelligent document analysis assistant. Your role is to provide accurate, concise, and helpful answers based solely on the provided context.
+        # 2. Create retriever — fetch top 5 chunks for richer context
+        retriever = vector_db.as_retriever(search_kwargs={"k": 5})
 
-Guidelines:
-- Answer questions using ONLY the information from the provided context
-- If the context doesn't contain enough information to answer the question, clearly state that
-- Be precise and cite specific details from the context when relevant
-- If asked about something not in the context, say "I don't have that information in the provided document"
-- Maintain a professional and helpful tone
-- Structure your answers clearly with bullet points or paragraphs as appropriate"""),
-            ("user", """Context from the document:
+        # 3. Retrieve relevant chunks
+        docs = retriever.invoke(question)
+
+        # 4. Build context with chunk separators so the model sees boundaries
+        context_parts = []
+        for i, doc in enumerate(docs, 1):
+            context_parts.append(f"[Excerpt {i}]\n{doc.page_content.strip()}")
+        context = "\n\n".join(context_parts)
+
+        # 5. Enhanced prompt
+        prompt = ChatPromptTemplate.from_messages([
+            ("system", """You are an expert AI document analyst. Your job is to give clear, accurate, and well-structured answers based strictly on the document excerpts provided.
+
+RESPONSE FORMAT:
+- Start with a direct, one-sentence answer to the question when possible.
+- Then elaborate with supporting details from the document.
+- Use **bold** for key terms, names, numbers, or critical facts.
+- Use bullet points (- item) for lists, features, or multiple facts.
+- Use numbered lists (1. step) for processes or sequential information.
+- Use short paragraphs — never write a wall of text.
+- If the answer spans multiple topics, use a short heading like "**Topic:**" to separate them.
+
+CONTENT RULES:
+- Answer ONLY using the provided document excerpts. Do not use outside knowledge.
+- Quote short phrases from the document (in "quotes") when they directly support your answer.
+- If the excerpts partially answer the question, share what is available and clearly state: "The document does not provide further detail on [X]."
+- If the question cannot be answered from the document at all, say exactly: "This information is not available in the uploaded document."
+- Never fabricate, assume, or guess information.
+
+TONE: Confident, professional, and conversational. Be concise but complete."""),
+            ("user", """Document excerpts:
 {context}
 
 Question: {question}
 
 Answer:""")
         ])
-        
-        # 6. Create chain and invoke
+
+        # 6. Build and invoke chain
         chain = prompt | self.llm | StrOutputParser()
-        
-        response = chain.invoke({
-            "context": context,
-            "question": question
-        })
-        
+        response = chain.invoke({"context": context, "question": question})
         return response

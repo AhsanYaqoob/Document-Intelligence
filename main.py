@@ -1,10 +1,15 @@
 import os
 from fastapi import FastAPI, Depends, HTTPException, Header
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from dotenv import load_dotenv
 
-load_dotenv() 
+load_dotenv()
 
 app = FastAPI(title="AI Document Intelligence Backend")
+
+# Serve frontend static assets (css, js)
+app.mount("/static", StaticFiles(directory="frontend"), name="static")
 
 # Security: Check for X-API-KEY in headers
 async def verify_api_key(x_api_key: str = Header(...)):
@@ -22,4 +27,4 @@ app.include_router(api_router, prefix="/api/v1")
 
 @app.get("/")
 def home():
-    return {"message": "Server is running. Use /api/v1/upload to start."}
+    return FileResponse("frontend/index.html")
