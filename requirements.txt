@@ -12,8 +12,8 @@ langchain-groq
 langchain-community
 langchain-text-splitters
 
-# Vector Store & Embeddings (uses HF Inference API — no local model, no PyTorch, no Rust)
-faiss-cpu
+# Retrieval (BM25 - pure Python, no model, no RAM overhead)
+rank_bm25
 
 # Document Processing
 pypdf

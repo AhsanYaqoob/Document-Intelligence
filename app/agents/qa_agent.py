@@ -21,8 +21,8 @@ class QAAgent:
         if not vector_db:
             return "Knowledge base not found. Please upload the document first."
 
-        # 2. Create retriever — fetch top 5 chunks for richer context
-        retriever = vector_db.as_retriever(search_kwargs={"k": 5})
+        # 2. BM25Retriever is already the retriever — no .as_retriever() needed
+        retriever = vector_db
 
         # 3. Retrieve relevant chunks
         docs = retriever.invoke(question)
