@@ -411,7 +411,7 @@ function appendMessage(role, text, sources = []) {
 function appendTyping() {
   const id = "typing-" + Date.now();
   const div = document.createElement("div");
-  div.className = "chat-message ai";
+  div.className = "chat-message ai chat-message--typing";
   div.id = id;
   div.innerHTML = `
     <div class="bubble bubble--typing">

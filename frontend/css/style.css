@@ -525,20 +525,27 @@ html, body {
 }
 
 /* Typing indicator */
-.typing-bubble { display: flex; gap: 5px; align-items: center; padding: 4px 2px; }
+.typing-bubble { display: flex; gap: 5px; align-items: center; }
 .typing-bubble span {
   width: 7px; height: 7px; background: var(--text-sub);
-  border-radius: 50%; animation: bounce 1.2s infinite;
+  border-radius: 50%; animation: bounce 1.2s infinite; flex-shrink: 0;
 }
 .typing-bubble span:nth-child(2) { animation-delay: 0.2s; }
 .typing-bubble span:nth-child(3) { animation-delay: 0.4s; }
 @keyframes bounce {
   0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-6px); }
 }
-/* make the typing indicator bubble only as wide as its dots */
-.bubble--typing {
+/* Typing indicator — compact bubble, shrinks to fit just the 3 dots */
+.chat-message--typing {
   width: fit-content !important;
+  max-width: fit-content !important;
+}
+.bubble--typing {
   padding: 12px 16px !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  width: fit-content !important;
+  min-width: unset !important;
 }
 
 /* Streaming cursor */
