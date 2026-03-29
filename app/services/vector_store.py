@@ -1,6 +1,6 @@
 import os
 from langchain_community.vectorstores import FAISS
-from langchain_community.embeddings.fastembed import FastEmbedEmbeddings
+from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
 
 VECTOR_DB_DIR = os.getenv("VECTOR_DB_DIR", "./data/vector_db")
 
@@ -9,14 +9,25 @@ class VectorStoreService:
 
     @classmethod
     def get_embeddings(cls):
-        """Lazy-load ONNX-based embeddings (no PyTorch, ~150MB RAM)."""
+        """
+        Use HuggingFace Inference API for embeddings.
+        - No local model download
+        - No PyTorch, no Rust
+        - Free HF token required (hf.co -> Settings -> Tokens)
+        """
         if cls._embeddings is None:
-            print("🔄 Loading embedding model (ONNX)...")
-            # BAAI/bge-small-en-v1.5: 384-dim, ~130MB model file, ONNX runtime
-            cls._embeddings = FastEmbedEmbeddings(
-                model_name="BAAI/bge-small-en-v1.5"
+            hf_token = os.getenv("HF_TOKEN")
+            if not hf_token:
+                raise RuntimeError(
+                    "HF_TOKEN env variable is missing. "
+                    "Get a free token at https://huggingface.co/settings/tokens"
+                )
+            print("🔄 Initialising HuggingFace Inference API embeddings...")
+            cls._embeddings = HuggingFaceInferenceAPIEmbeddings(
+                api_key=hf_token,
+                model_name="sentence-transformers/all-MiniLM-L6-v2",
             )
-            print("✅ Embedding model ready!")
+            print("✅ Embeddings ready!")
         return cls._embeddings
 
     def save_index(self, chunks, doc_id: str):

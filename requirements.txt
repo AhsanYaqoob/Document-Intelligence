@@ -12,8 +12,7 @@ langchain-groq
 langchain-community
 langchain-text-splitters
 
-# Vector Store & Embeddings (fastembed = ONNX-based, ~150MB RAM vs PyTorch ~1.5GB)
-fastembed
+# Vector Store & Embeddings (uses HF Inference API — no local model, no PyTorch, no Rust)
 faiss-cpu
 
 # Document Processing
