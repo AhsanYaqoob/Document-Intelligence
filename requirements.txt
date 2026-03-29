@@ -11,10 +11,9 @@ langchain-core
 langchain-groq
 langchain-community
 langchain-text-splitters
-langchain-huggingface
 
-# Vector Store & Embeddings
-sentence-transformers
+# Vector Store & Embeddings (fastembed = ONNX-based, ~150MB RAM vs PyTorch ~1.5GB)
+fastembed
 faiss-cpu
 
 # Document Processing
